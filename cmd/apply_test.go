@@ -97,22 +97,6 @@ func Test_filterFeatures(t *testing.T) {
 			expectedError:    nil,
 		},
 		{
-			title: "AWS ECR is detected as a feature",
-			planConfig: types.Plan{
-				EnableECR: true,
-			},
-			expectedFeatures: []string{types.DefaultFeature, types.ECRFeature},
-			expectedError:    nil,
-		},
-		{
-			title: "AWS ECR is disabled when not set as a feature",
-			planConfig: types.Plan{
-				EnableECR: false,
-			},
-			expectedFeatures: []string{types.DefaultFeature},
-			expectedError:    nil,
-		},
-		{
 			title: "Every field which defines populated feature is populated for gitlab",
 			planConfig: types.Plan{
 				SCM: types.GitLabSCM,

@@ -38,9 +38,6 @@ const (
 	GitLabSCM = "gitlab"
 	// GitHubSCM repository manager name as displayed in the init.yaml file
 	GitHubSCM = "github"
-
-	// ECRFeature enable ECR
-	ECRFeature = "ecr"
 )
 
 type Plan struct {
@@ -48,7 +45,6 @@ type Plan struct {
 	Orchestration        string                   `yaml:"orchestration,omitempty"`
 	Secrets              []KeyValueNamespaceTuple `yaml:"secrets,omitempty"`
 	RootDomain           string                   `yaml:"root_domain,omitempty"`
-	Registry             string                   `yaml:"registry,omitempty"`
 	CustomersURL         string                   `yaml:"customers_url,omitempty"`
 	SCM                  string                   `yaml:"scm,omitempty"`
 	Github               Github                   `yaml:"github,omitempty"`
@@ -65,8 +61,6 @@ type Plan struct {
 	OpenFaaSCloudVersion string                   `yaml:"openfaas_cloud_version,omitempty"`
 	NetworkPolicies      bool                     `yaml:"network_policies,omitempty"`
 	BuildBranch          string                   `yaml:"build_branch,omitempty"`
-	EnableECR            bool                     `yaml:"enable_ecr,omitempty"`
-	ECRConfig            ECRConfig                `yaml:"ecr_config,omitempty"`
 	CustomersSecret      bool                     `yaml:"customers_secret,omitempty"`
 	IngressOperator      bool                     `yaml:"ingress_operator,omitempty"`
 	OpenFaaSOperator     bool                     `yaml:"openfaas_operator,omitempty"`
@@ -145,8 +139,4 @@ type TLSConfig struct {
 	IssuerType  string `yaml:"issuer_type,omitempty"`
 	Region      string `yaml:"region,omitempty"`
 	AccessKeyID string `yaml:"access_key_id,omitempty"`
-}
-
-type ECRConfig struct {
-	ECRRegion string `yaml:"ecr_region,omitempty"`
 }

@@ -20,7 +20,6 @@
 * Add version number to YAML file i.e `1.0` to enable versioning/migration of configs
 * Build a suitable dev environment for local work (without Ingress, TLS)
 * Use the Cobra CLI package and separate CLI commands
-* Add a registry login command
 * Add a GitHub integration command
 * Accept several YAML override files
 * go modules instead of `dep`

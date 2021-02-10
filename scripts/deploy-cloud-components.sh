@@ -4,13 +4,6 @@ cp ./tmp/generated-gateway_config.yml ./tmp/openfaas-cloud/gateway_config.yml
 cp ./tmp/generated-github.yml ./tmp/openfaas-cloud/github.yml
 cp ./tmp/generated-slack.yml ./tmp/openfaas-cloud/slack.yml
 cp ./tmp/generated-dashboard_config.yml ./tmp/openfaas-cloud/dashboard/dashboard_config.yml
-cp ./tmp/generated-aws.yml ./tmp/openfaas-cloud/aws.yml
-
-kubectl apply -f ./tmp/openfaas-cloud/yaml/core/of-builder-svc.yml
-
-# Update builder for any ECR secrets needed
-cp ./tmp/generated-of-builder-dep.yml ./tmp/openfaas-cloud/yaml/core/of-builder-dep.yml
-kubectl apply -f ./tmp/openfaas-cloud/yaml/core/of-builder-dep.yml
 
 kubectl apply -f ./tmp/openfaas-cloud/yaml/core/rbac-import-secrets.yml
 
@@ -73,11 +66,6 @@ if [ "$GITLAB" = "true" ] ; then
     cp ../generated-gitlab.yml ./gitlab.yml
     echo "Deploying gitlab functions..."
     faas-cli deploy -f ./gitlab.yml
-fi
-
-if [ "$ENABLE_AWS_ECR" = "true" ] ; then
-    echo "Deploying AWS ECR functions (register-image)..."
-    faas-cli deploy -f ./aws.yml
 fi
 
 kubectl create secret generic sealedsecrets-public-key -n openfaas-fn --from-file=../pub-cert.pem \

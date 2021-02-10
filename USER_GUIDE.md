@@ -40,10 +40,9 @@ k3d create --k3s-server-arg "--no-deploy=traefik"
 
 ### Credentials and dependent systems
 
-OpenFaaS Cloud installs, manages, and bundles software which spans source-control, TLS, DNS, and Docker image registries. You must have the following prepared before you start your installation.
+OpenFaaS Cloud installs, manages, and bundles software which spans source-control, TLS, and DNS. You must have the following prepared before you start your installation.
 
 * You'll need to register a domain-name and set it up for management in Google Cloud DNS, DigitalOcean, Cloudflare DNS or AWS Route 53.
-* Set up a registry - the simplest option is to use your [Docker Hub](https://hub.docker.com) account. You can also use your own private registry or a cloud-hosted registry. You will need the credentials. If you need to, [set up your own private registry](https://github.com/alexellis/k8s-tls-registry).
 * Admin-level access to a GitHub.com account or a self-hosted GitLab installation.
 * A valid email address for use with [LetsEncrypt](https://letsencrypt.org), beware of [rate limits](https://letsencrypt.org/docs/rate-limits/).
 * Admin access to a Kubernetes cluster.
@@ -171,77 +170,6 @@ If you picked a root domain of `example.com`, then your URLs would correspond to
 * `*.example.com`
 
 After the installation has completed in a later step, you will need to create DNS A records with your DNS provider. You don't need to create these records now.
-
-## Prepare your Docker registry (if not using AWS ECR)
-
-> Note: If using ECR, please go to the next step.
-
-ofc-bootstrap has a command to generate the registry auth file in the correct format.
-
-If you are using Dockerhub you only need to supply your `--username` and `--password-stdin` (or `--password`, but this leaves the password in history).
-```sh
-
-ofc-bootstrap registry-login --username <your-registry-username> --password-stdin
-(then enter your password and use ctrl+d to finish input)
-```
-
-You could also have you password in a file, or environment variable and echo/cat this instead of entering interactively
-
-If you are using a different registry (that is not ECR) then also provide a `--server` as well.
-
-
-Find the section of the YAML `registry: docker.io/ofctest/`
-
-You need to replace the value for your registry, note the final `/` which is required.
-
-* Valid: `registry: docker.io/my-org/`
-* Invalid: `registry: docker.io/my-org`
-
-* Valid: `registry: my-corp.jfrog.io/ofc-prod/`
-* Invalid: `registry: my-corp.jfrog.io/ofc-prod`
-* Invalid: `registry: my-corp.jfrog.io/`
-
-## Prepare your Docker registry (if using AWS ECR)
-
-OpenFaaS Cloud also supports Amazon's managed container registry called ECR.
-
-* Set `enable_ecr: true` in `init.yaml`
-
-* Set your AWS region `ecr_region: "your-aws-region"` in `init.yaml`
- 
-* Define a `./credentials/config.json` by running the following command
-
-```sh
-ofc-bootstrap registry-login --ecr --region <your-aws-region> --account-id <your-account-id>
-```
-
-At runtime it will use your mounted AWS credentials file from a separate secret to gain an access token for ECR. ECR access tokens need to be refreshed around every 12 hours and this is handled by the `ecr-login` binary built-into the OFC builder container image.
-
-* Set the `registry`
-
-Find the section of the YAML `registry:` set the value accordingly, replacing `ACCOUNT_ID` and `REGION` as per previous step:
-
-`$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/`
-
-The final `/` is required
-
-When using ECR a user can namespace their registries per cluster by adding a suffix to the ecr registry:
-
-`$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/your-cluster-suffix`
-
-This would create registries prefixed with `your-cluster-prefix` for the user's docker images.
-
-* Create a new user with the role `AmazonEC2ContainerRegistryFullAccess` - see also [AWS permissions for ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/ecr_managed_policies.html)
-
-* The file will be read from `~/.aws/credentials` by default, but you can change this via editing the path in `value_from` under the `ecr-credentials` secret
-
-* Get the credentials from the AWS console for your new user, and save the following file: `~/.aws/credentials`
-
-```ini
-[default]
-aws_access_key_id = ACCESS_KEY_ID
-aws_secret_access_key = SECRET_ACCESS_KEY
-```
 
 ## Pick your Source Control Management (SCM)
 
@@ -452,8 +380,6 @@ Now check the following and run a smoke test:
 
 * DNS is configured to the correct IP
 * Check TLS certificates are issued as expected
-* Check that you can trigger a build
-* Check that your build is pushing images to your registry or the Docker Hub
 * Check that your endpoint can be accessed 
 
 ## View your dashboard
@@ -515,14 +441,8 @@ cd tmp/openfaas-cloud/
 # Edit gateway_config.yml
 # Edit buildshiprun_limits.yml
 
-# Edit aws.yml if you want to change AWS ECR settings such as the region
-
 # Update all functions
 faas-cli deploy -f stack.yml
-
-
-# Update AWS ECR functions if needed
-faas-cli deploy -f aws.yml
 
 # Update a single function, such as "buildshiprun"
 faas-cli deploy -f stack.yml --filter=buildshiprun

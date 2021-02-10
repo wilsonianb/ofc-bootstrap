@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"bytes"
-	b64 "encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -26,7 +25,6 @@ import (
 	"github.com/openfaas/ofc-bootstrap/pkg/ingress"
 	"github.com/openfaas/ofc-bootstrap/pkg/stack"
 	"github.com/openfaas/ofc-bootstrap/pkg/tls"
-	"github.com/openfaas/ofc-bootstrap/pkg/validators"
 
 	"github.com/openfaas/ofc-bootstrap/pkg/types"
 	yaml "gopkg.in/yaml.v2"
@@ -172,11 +170,6 @@ func runApplyCommandE(command *cobra.Command, _ []string) error {
 	os.MkdirAll("tmp", 0700)
 	ioutil.WriteFile("tmp/go.mod", []byte("\n"), 0700)
 
-	fmt.Println("Validating registry credentials file")
-	if err := validateRegistryAuth(plan.Registry, plan.Secrets, plan.EnableECR); err != nil {
-		return errors.Wrap(err, "error with registry credentials file")
-	}
-
 	start := time.Now()
 	err = process(plan, prefs)
 	done := time.Since(start)
@@ -229,23 +222,6 @@ func taskGivesStdout(tool string) error {
 	return nil
 }
 
-func validateRegistryAuth(regEndpoint string, planSecrets []types.KeyValueNamespaceTuple, enableECR bool) error {
-	if enableECR {
-		return nil
-	}
-	for _, planSecret := range planSecrets {
-		if planSecret.Name == "registry-secret" {
-			confFileLocation := planSecret.Files[0].ExpandValueFrom()
-			fileBytes, err := ioutil.ReadFile(confFileLocation)
-			if err != nil {
-				return err
-			}
-			return validators.ValidateRegistryAuth(regEndpoint, fileBytes)
-		}
-	}
-	return nil
-}
-
 func validatePlan(plan types.Plan) error {
 	for _, secret := range plan.Secrets {
 		if featureEnabled(plan.Features, secret.Filters) {
@@ -284,11 +260,6 @@ func process(plan types.Plan, prefs InstallPreferences) error {
 
 	if !prefs.SkipCreateSecrets {
 		createSecrets(plan)
-	}
-
-	saErr := patchFnServiceaccount()
-	if saErr != nil {
-		log.Println(saErr)
 	}
 
 	if plan.TLS {
@@ -557,27 +528,6 @@ func installOpenfaas(scaleToZero, ingressOperator, openfaasOperator bool) error 
 	return nil
 }
 
-func patchFnServiceaccount() error {
-	log.Println("Patching openfaas-fn serviceaccount for pull secrets")
-
-	task := execute.ExecTask{
-		Command:     "scripts/patch-fn-serviceaccount.sh",
-		Shell:       true,
-		StreamStdio: false,
-	}
-
-	taskRes, err := task.Execute()
-
-	if err != nil {
-		return err
-	}
-
-	if len(taskRes.Stderr) > 0 {
-		log.Println(taskRes.Stderr)
-	}
-	return nil
-}
-
 func installCertmanager() error {
 	log.Println("Installing cert-manager")
 
@@ -703,18 +653,12 @@ func deployCloudComponents(plan types.Plan) error {
 		networkPoliciesEnv = "ENABLE_NETWORK_POLICIES=true"
 	}
 
-	enableECREnv := ""
-	if plan.EnableECR {
-		enableECREnv = "ENABLE_AWS_ECR=true"
-	}
-
 	task := execute.ExecTask{
 		Command: "./scripts/deploy-cloud-components.sh",
 		Shell:   true,
 		Env: []string{authEnv,
 			gitlabEnv,
 			networkPoliciesEnv,
-			enableECREnv,
 		},
 		StreamStdio: false,
 	}
@@ -744,10 +688,6 @@ func filterFeatures(plan types.Plan) (types.Plan, error) {
 	var err error
 
 	plan.Features = append(plan.Features, types.DefaultFeature)
-
-	if plan.EnableECR == true {
-		plan.Features = append(plan.Features, types.ECRFeature)
-	}
 
 	plan, err = filterGitRepositoryManager(plan)
 	if err != nil {

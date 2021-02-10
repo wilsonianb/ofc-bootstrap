@@ -124,44 +124,6 @@ secrets:
       - "cloudflare_dns01"
     namespace: "cert-manager"
 
-  # Used by Buildkit to push images to your registry
-  - name: "registry-secret"
-    files:
-      - name: "config.json"
-        value_from: "./credentials/config.json"
-    filters:
-      - "default"
-    namespace: "openfaas"
-
-  # Used to pull functions / images to nodes by Kubernetes
-  - name: "registry-pull-secret"
-    files:
-      - name: ".dockerconfigjson"
-        value_from: "./credentials/config.json"
-    namespace: "openfaas-fn"
-    filters:
-      - "default"
-    type: "kubernetes.io/dockerconfigjson"
-
-    # ECR credentials to push to AWS ECR
-    ## Make sure you do not use your admin account in ~/.aws/credentials, but a
-    ## new user with ECR power-user permissions only.
-  - name: "aws-ecr-credentials"
-    files:
-      - name: "credentials"
-        value_from: "~/.aws/credentials"
-    filters:
-      - "ecr"
-    namespace: "openfaas"
-
-  - name: "aws-ecr-createrepo-credentials"
-    files:
-      - name: "credentials"
-        value_from: "~/.aws/credentials"
-    filters:
-      - "ecr"
-    namespace: "openfaas-fn"
-
 ## If not using a HTTPS URL, then set a list of CUSTOMERS
 ## To use this set "value_from" to a real file path, and put in a list (each item on a new line) of usernames, without other whitespace
   - name: "of-customers"
@@ -179,25 +141,9 @@ secrets:
     filters:
       - "default"
 
-### Docker registry
-#### This can be any cluster accessible by your cluster. To populate the file
-#### run `docker login` with "store in keychain" turned off in Docker Desktop.
-#### This can also be your private registry
-#### Format: registry/username/ - i.e. replace ofctest with your login
-
-registry: docker.io/ofctest/
-
 ### Use a secret instead of a publicly accessible URL for the ACL
 ### of valid users.
 customers_secret: false
-
-### Enable only if using AWS ECR
-enable_ecr: false
-
-### Change if your using ECR
-ecr_config:
-  ### The region to use for ECR
-  ecr_region: "eu-central-1"
 
 ### Your root DNS domain name, this can be a sub-domain i.e. staging.o6s.io / prod.o6s.io
 root_domain: "myfaas.club"

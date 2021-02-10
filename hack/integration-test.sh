@@ -13,11 +13,9 @@ touch ~/Downloads/do-access-token
 
 # Run end to end
 
-./bin/ofc-bootstrap registry-login --username fake --password also-fake
 ./bin/ofc-bootstrap apply --file example.init.yaml
 
 kubectl rollout status -n openfaas deploy/edge-router
-kubectl rollout status -n openfaas deploy/of-builder
 kubectl rollout status -n openfaas deploy/gateway
 
 kubectl rollout status -n openfaas-fn deploy/system-github-event

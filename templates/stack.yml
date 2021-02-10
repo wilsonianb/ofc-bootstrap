@@ -74,30 +74,6 @@ functions:
       - gitlab-api-token
     {{ end }}
 
-  buildshiprun:
-    lang: go
-    handler: ./buildshiprun
-    image: ghcr.io/${REPO:-openfaas}/ofc-buildshiprun:0.14.6
-    labels:
-      openfaas-cloud: "1"
-      role: openfaas-system
-      com.openfaas.scale.zero: false
-    environment:
-      read_timeout: 5m
-      write_timeout: 5m
-      write_debug: true
-      read_debug: true
-      scaling_factor: 50
-    environment_file:
-      - buildshiprun_limits.yml
-      - gateway_config.yml
-      - github.yml
-    secrets:
-      - basic-auth-user
-      - basic-auth-password
-      - payload-secret
-#      - swarm-pull-secret
-
   garbage-collect:
     lang: go
     handler: ./garbage-collect
@@ -158,25 +134,6 @@ functions:
     environment_file:
       - github.yml
     secrets:
-      - payload-secret
-
-  pipeline-log:
-    lang: go
-    handler: ./pipeline-log
-    image: ghcr.io/${REPO:-openfaas}/ofc-pipeline-log:0.14.6
-    labels:
-      openfaas-cloud: "1"
-      role: openfaas-system
-      com.openfaas.scale.zero: false
-    environment:
-      write_debug: true
-      read_debug: true
-      combine_output: false
-    environment_file:
-      - gateway_config.yml
-    secrets:
-      - s3-access-key
-      - s3-secret-key
       - payload-secret
 
   list-functions:

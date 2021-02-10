@@ -15,7 +15,6 @@ type gitlabConfig struct {
 }
 
 type gatewayConfig struct {
-	Registry             string
 	RootDomain           string
 	CustomersURL         string
 	Scheme               string
@@ -36,17 +35,9 @@ type authConfig struct {
 	TLSEnabled            bool
 }
 
-type builderConfig struct {
-	ECR bool
-}
-
 type stackConfig struct {
 	GitHub              bool
 	CustomersSecretPath string
-}
-
-type awsConfig struct {
-	ECRRegion string
 }
 
 type dashboardConfig struct {
@@ -70,7 +61,6 @@ func Apply(plan types.Plan) error {
 	}
 
 	if gwConfigErr := generateTemplate("gateway_config", plan, gatewayConfig{
-		Registry:             plan.Registry,
 		RootDomain:           plan.RootDomain,
 		CustomersURL:         plan.CustomersURL,
 		Scheme:               scheme,
@@ -145,18 +135,6 @@ func Apply(plan types.Plan) error {
 		CustomersSecretPath: customersSecretPath,
 	}); stackErr != nil {
 		return stackErr
-	}
-
-	if builderErr := generateTemplate("of-builder-dep", plan, builderConfig{
-		ECR: plan.EnableECR,
-	}); builderErr != nil {
-		return builderErr
-	}
-
-	if ecrErr := generateTemplate("aws", plan, awsConfig{
-		ECRRegion: plan.ECRConfig.ECRRegion,
-	}); ecrErr != nil {
-		return ecrErr
 	}
 
 	return nil

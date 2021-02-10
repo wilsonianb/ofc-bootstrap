@@ -17,7 +17,6 @@ The `ofc-bootstrap` will install the following components:
 * [Nginx as your IngressController](https://github.com/kubernetes/ingress-nginx) - with rate-limits configured
 * [SealedSecrets](https://github.com/bitnami-labs/sealed-secrets) from Bitnami - store secrets for functions in git
 * [cert-manager](https://github.com/jetstack/cert-manager) - provision HTTPS certificates with LetsEncrypt
-* [buildkit from Docker](https://github.com/moby/buildkit) - to building immutable Docker images for each function
 * Authentication/authorization - through OAuth2 delegating to GitHub/GitLab
 * Deep integration into GitHub/GitLab - for updates and commit statuses
 * A personalized dashboard for each user

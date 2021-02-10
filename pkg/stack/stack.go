@@ -78,12 +78,6 @@ func Apply(plan types.Plan) error {
 		return githubConfigErr
 	}
 
-	if slackConfigErr := generateTemplate("slack", plan, types.Slack{
-		URL: plan.Slack.URL,
-	}); slackConfigErr != nil {
-		return slackConfigErr
-	}
-
 	if plan.SCM == "gitlab" {
 		if gitlabConfigErr := generateTemplate("gitlab", plan, gitlabConfig{
 			GitLabInstance:      plan.Gitlab.GitLabInstance,

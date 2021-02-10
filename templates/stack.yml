@@ -153,17 +153,6 @@ functions:
       - basic-auth-user
       - basic-auth-password
 
-  audit-event:
-    lang: go
-    handler: ./audit-event
-    image: ghcr.io/${REPO:-openfaas}/ofc-audit-event:0.14.6
-    labels:
-      openfaas-cloud: "1"
-      role: openfaas-system
-      com.openfaas.scale.zero: false
-    environment_file:
-      - slack.yml
-
   echo:
     lang: go
     handler: ./echo

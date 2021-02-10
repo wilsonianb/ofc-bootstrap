@@ -53,7 +53,6 @@ type Plan struct {
 	OAuth                OAuth                    `yaml:"oauth,omitempty"`
 	EnableOAuth          bool                     `yaml:"enable_oauth,omitempty"`
 	TLSConfig            TLSConfig                `yaml:"tls_config,omitempty"`
-	Slack                Slack                    `yaml:"slack,omitempty"`
 	Ingress              string                   `yaml:"ingress,omitempty"`
 	Deployment           Deployment               `yaml:"deployment,omitempty"`
 	EnableDockerfileLang bool                     `yaml:"enable_dockerfile_lang,omitempty"`
@@ -121,10 +120,6 @@ type Github struct {
 
 type Gitlab struct {
 	GitLabInstance string `yaml:"gitlab_instance,omitempty"`
-}
-
-type Slack struct {
-	URL string `yaml:"url,omitempty"`
 }
 
 type OAuth struct {

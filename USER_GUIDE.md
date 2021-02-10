@@ -175,9 +175,6 @@ If you are using a public cloud offering and you know that they can offer a `Loa
 
 If you are deploying to a cloud or Kubernetes cluster where the type `LoadBalancer` is unavailable then you will need to change `ingress: loadbalancer` to `ingress: host` in `init.yaml`. Nginx will be configured as a `DaemonSet` exposed on port `80` and `443` on each node in your cluster. It is recommended that you create a DNS mapping between a chosen name and the IP of each node.
 
-> Note: it is a common error for new users to try to access the dashboard using the IP address of the load-balancer.
-> You must use the DNS name for the dashboard: i.e. `system.example.com/dashboard/username`
-
 ### Use TLS (recommended)
 
 OpenFaaS Cloud can use cert-manager to automatically provision TLS certificates for your OpenFaaS Cloud cluster using the DNS01 challenge.

@@ -18,7 +18,6 @@ touch ~/Downloads/do-access-token
 kubectl rollout status -n openfaas deploy/gateway
 
 kubectl rollout status -n openfaas-fn deploy/list-functions
-kubectl rollout status -n openfaas-fn deploy/system-dashboard
 
 kubectl get deploy -n kube-system
 kubectl get deploy -n openfaas

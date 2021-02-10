@@ -21,11 +21,6 @@ type authConfig struct {
 type stackConfig struct {
 }
 
-type dashboardConfig struct {
-	RootDomain string
-	Scheme     string
-}
-
 // Apply creates `templates/gateway_config.yml` to be referenced by stack.yml
 func Apply(plan types.Plan) error {
 	scheme := "http"
@@ -39,14 +34,6 @@ func Apply(plan types.Plan) error {
 		CustomTemplates: plan.Deployment.FormatCustomTemplates(),
 	}); gwConfigErr != nil {
 		return gwConfigErr
-	}
-
-	dashboardConfigErr := generateTemplate("dashboard_config", plan, dashboardConfig{
-		RootDomain: plan.RootDomain,
-		Scheme:     scheme,
-	})
-	if dashboardConfigErr != nil {
-		return dashboardConfigErr
 	}
 
 	if ofAuthDepErr := generateTemplate("edge-auth-dep", plan, authConfig{}); ofAuthDepErr != nil {

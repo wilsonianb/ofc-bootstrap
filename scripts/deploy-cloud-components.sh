@@ -1,7 +1,6 @@
 #!/bin/bash
 
 cp ./tmp/generated-gateway_config.yml ./tmp/openfaas-cloud/gateway_config.yml
-cp ./tmp/generated-dashboard_config.yml ./tmp/openfaas-cloud/dashboard/dashboard_config.yml
 
 cp ./tmp/generated-edge-auth-dep.yml ./tmp/openfaas-cloud/yaml/core/edge-auth-dep.yml
 kubectl apply -f ./tmp/openfaas-cloud/yaml/core/edge-auth-dep.yml
@@ -51,8 +50,6 @@ echo -n $ADMIN_PASSWORD | faas-cli login --username admin --password-stdin
 cp ../generated-stack.yml ./stack.yml
 
 faas-cli deploy
-
-TAG=0.14.6 faas-cli deploy -f ./dashboard/stack.yml
 
 sleep 2
 

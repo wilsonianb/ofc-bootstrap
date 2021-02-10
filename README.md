@@ -16,7 +16,6 @@ The `ofc-bootstrap` will install the following components:
 * [OpenFaaS](https://github.com/openfaas/faas) installed with helm
 * [Nginx as your IngressController](https://github.com/kubernetes/ingress-nginx) - with rate-limits configured
 * [cert-manager](https://github.com/jetstack/cert-manager) - provision HTTPS certificates with LetsEncrypt
-* A personalized dashboard for each user
 
 ### Conceptual design
 

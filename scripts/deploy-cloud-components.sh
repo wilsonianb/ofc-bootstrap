@@ -3,8 +3,6 @@
 cp ./tmp/generated-gateway_config.yml ./tmp/openfaas-cloud/gateway_config.yml
 cp ./tmp/generated-dashboard_config.yml ./tmp/openfaas-cloud/dashboard/dashboard_config.yml
 
-kubectl apply -f ./tmp/openfaas-cloud/yaml/core/rbac-import-secrets.yml
-
 cp ./tmp/generated-edge-auth-dep.yml ./tmp/openfaas-cloud/yaml/core/edge-auth-dep.yml
 kubectl apply -f ./tmp/openfaas-cloud/yaml/core/edge-auth-dep.yml
 kubectl apply -f ./tmp/openfaas-cloud/yaml/core/edge-router-dep.yml
@@ -53,9 +51,6 @@ echo -n $ADMIN_PASSWORD | faas-cli login --username admin --password-stdin
 cp ../generated-stack.yml ./stack.yml
 
 faas-cli deploy
-
-kubectl create secret generic sealedsecrets-public-key -n openfaas-fn --from-file=../pub-cert.pem \
- --dry-run=client -o yaml | kubectl apply -f -
 
 TAG=0.14.6 faas-cli deploy -f ./dashboard/stack.yml
 

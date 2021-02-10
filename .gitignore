@@ -1,10 +1,8 @@
 ofc-bootstrap
 tmp
 bootstrap
-pub-cert.pem
 .idea
 .vscode
-kubeseal
 key
 key.pub
 ofc-bootstrap-darwin

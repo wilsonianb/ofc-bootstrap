@@ -34,7 +34,6 @@ func init() {
 	rootCommand.AddCommand(applyCmd)
 
 	applyCmd.Flags().StringArrayP("file", "f", []string{""}, "A number of init.yaml plan files")
-	applyCmd.Flags().Bool("skip-sealedsecrets", false, "Skip SealedSecrets installation")
 	applyCmd.Flags().Bool("skip-create-secrets", false, "Skip creating secrets")
 	applyCmd.Flags().Bool("print-plan", false, "Print merged plan and exit")
 }
@@ -47,7 +46,6 @@ var applyCmd = &cobra.Command{
 }
 
 type InstallPreferences struct {
-	SkipSealedSecrets bool
 	SkipCreateSecrets bool
 }
 
@@ -67,10 +65,6 @@ func runApplyCommandE(command *cobra.Command, _ []string) error {
 		return err
 	}
 
-	prefs.SkipSealedSecrets, err = command.Flags().GetBool("skip-sealedsecrets")
-	if err != nil {
-		return err
-	}
 	prefs.SkipCreateSecrets, err = command.Flags().GetBool("skip-create-secrets")
 	if err != nil {
 		return err
@@ -123,7 +117,7 @@ func runApplyCommandE(command *cobra.Command, _ []string) error {
 	}
 	fmt.Printf("User dir: %s\n", userDir)
 
-	install := []string{"kubectl", "helm", "faas-cli", "arkade", "kubeseal"}
+	install := []string{"kubectl", "helm", "faas-cli", "arkade"}
 	if err := getTools(clientArch, clientOS, userDir, install); err != nil {
 		return err
 	}
@@ -144,7 +138,6 @@ func runApplyCommandE(command *cobra.Command, _ []string) error {
 		"kubectl version --client",
 		"helm version",
 		"faas-cli version",
-		"kubeseal --version",
 	}
 
 	if err := validateTools(tools); err != nil {
@@ -307,19 +300,6 @@ func process(plan types.Plan, prefs InstallPreferences) error {
 		return errors.Wrap(err, "stack.Apply(")
 	}
 
-	if !prefs.SkipSealedSecrets {
-		if err := installSealedSecrets(); err != nil {
-			return errors.Wrap(err, "unable to install sealed-secrets")
-		}
-
-		pubCert := exportSealedSecretPubCert()
-		writeErr := ioutil.WriteFile("tmp/pubcert.pem", []byte(pubCert), 0700)
-		if writeErr != nil {
-			log.Println(writeErr)
-			return writeErr
-		}
-	}
-
 	if err := cloneCloudComponents(plan.OpenFaaSCloudVersion); err != nil {
 		return errors.Wrap(err, "cloneCloudComponents")
 	}
@@ -452,35 +432,6 @@ func installIngressController(ingress string) error {
 	return nil
 }
 
-func installSealedSecrets() error {
-	log.Println("Installing sealed-secrets")
-
-	var env []string
-	args := []string{"install", "sealed-secrets", "--namespace=kube-system", "--wait"}
-
-	task := execute.ExecTask{
-		Command:     "arkade",
-		Args:        args,
-		Shell:       true,
-		Env:         env,
-		StreamStdio: false,
-	}
-
-	res, err := task.Execute()
-	if err != nil {
-		return err
-	}
-
-	if res.ExitCode != 0 {
-		return fmt.Errorf("non-zero exit-code: %s %s", res.Stdout, res.Stderr)
-	}
-
-	if len(res.Stderr) > 0 {
-		log.Printf("stderr: %s\n", res.Stderr)
-	}
-	return nil
-}
-
 func installOpenfaas(scaleToZero, ingressOperator, openfaasOperator bool) error {
 	log.Println("Installing openfaas")
 
@@ -575,33 +526,6 @@ func createSecrets(plan types.Plan) error {
 	}
 
 	return nil
-}
-
-func sealedSecretsReady() bool {
-
-	task := execute.ExecTask{
-		Command:     "./scripts/get-sealedsecretscontroller.sh",
-		Shell:       true,
-		StreamStdio: false,
-	}
-
-	res, err := task.Execute()
-	fmt.Println("sealedsecretscontroller", res.ExitCode, res.Stdout, res.Stderr, err)
-	return res.Stdout == "1"
-}
-
-func exportSealedSecretPubCert() string {
-
-	task := execute.ExecTask{
-		Command:     "./scripts/export-sealed-secret-pubcert.sh",
-		Shell:       true,
-		StreamStdio: false,
-		Env:         []string{"PATH=" + os.Getenv("PATH")},
-	}
-
-	res, err := task.Execute()
-	fmt.Println("secrets cert", res.ExitCode, res.Stdout, res.Stderr, err)
-	return res.Stdout
 }
 
 func certManagerReady() bool {

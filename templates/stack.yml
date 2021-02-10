@@ -23,26 +23,6 @@ functions:
       - basic-auth-password
       - payload-secret
 
-  import-secrets:
-    lang: go
-    handler: ./import-secrets
-    image: ghcr.io/${REPO:-openfaas}/ofc-import-secrets:0.14.6
-    annotations:
-      com.openfaas.serviceaccount: sealedsecrets-importer-rw
-    labels:
-      openfaas-cloud: "1"
-      role: openfaas-system
-      com.openfaas.scale.zero: false
-    environment:
-      write_debug: true
-      read_debug: true
-      validate_hmac: true
-      combined_output: false
-    environment_file:
-      - github.yml
-    secrets:
-      - payload-secret
-
   list-functions:
     lang: go
     handler: ./list-functions

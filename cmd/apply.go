@@ -638,11 +638,6 @@ func cloneCloudComponents(tag string) error {
 
 func deployCloudComponents(plan types.Plan) error {
 
-	gitlabEnv := ""
-	if plan.SCM == "gitlab" {
-		gitlabEnv = "GITLAB=true"
-	}
-
 	networkPoliciesEnv := ""
 	if plan.NetworkPolicies {
 		networkPoliciesEnv = "ENABLE_NETWORK_POLICIES=true"
@@ -652,7 +647,6 @@ func deployCloudComponents(plan types.Plan) error {
 		Command: "./scripts/deploy-cloud-components.sh",
 		Shell:   true,
 		Env: []string{
-			gitlabEnv,
 			networkPoliciesEnv,
 		},
 		StreamStdio: false,
@@ -684,11 +678,6 @@ func filterFeatures(plan types.Plan) (types.Plan, error) {
 
 	plan.Features = append(plan.Features, types.DefaultFeature)
 
-	plan, err = filterGitRepositoryManager(plan)
-	if err != nil {
-		return plan, fmt.Errorf("Error while filtering features: %s", err.Error())
-	}
-
 	if plan.TLS == true {
 		plan, err = filterDNSFeature(plan)
 		if err != nil {
@@ -710,17 +699,6 @@ func filterDNSFeature(plan types.Plan) (types.Plan, error) {
 		plan.Features = append(plan.Features, types.CloudflareDNS)
 	} else {
 		return plan, fmt.Errorf("Error unavailable DNS service provider: %s", plan.TLSConfig.DNSService)
-	}
-	return plan, nil
-}
-
-func filterGitRepositoryManager(plan types.Plan) (types.Plan, error) {
-	if plan.SCM == types.GitLabSCM {
-		plan.Features = append(plan.Features, types.GitLabFeature)
-	} else if plan.SCM == types.GitHubSCM {
-		plan.Features = append(plan.Features, types.GitHubFeature)
-	} else {
-		return plan, fmt.Errorf("Error unsupported Git repository manager: %s", plan.SCM)
 	}
 	return plan, nil
 }

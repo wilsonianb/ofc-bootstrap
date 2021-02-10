@@ -1,7 +1,6 @@
 #!/bin/bash
 
 cp ./tmp/generated-gateway_config.yml ./tmp/openfaas-cloud/gateway_config.yml
-cp ./tmp/generated-github.yml ./tmp/openfaas-cloud/github.yml
 cp ./tmp/generated-dashboard_config.yml ./tmp/openfaas-cloud/dashboard/dashboard_config.yml
 
 kubectl apply -f ./tmp/openfaas-cloud/yaml/core/rbac-import-secrets.yml
@@ -54,12 +53,6 @@ echo -n $ADMIN_PASSWORD | faas-cli login --username admin --password-stdin
 cp ../generated-stack.yml ./stack.yml
 
 faas-cli deploy
-
-if [ "$GITLAB" = "true" ] ; then
-    cp ../generated-gitlab.yml ./gitlab.yml
-    echo "Deploying gitlab functions..."
-    faas-cli deploy -f ./gitlab.yml
-fi
 
 kubectl create secret generic sealedsecrets-public-key -n openfaas-fn --from-file=../pub-cert.pem \
  --dry-run=client -o yaml | kubectl apply -f -

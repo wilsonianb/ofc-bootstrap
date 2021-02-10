@@ -3,8 +3,6 @@ environment:
 # URLs
   gateway_url:  http://gateway.openfaas:8080/
   gateway_public_url: {{.Scheme}}://cloud.{{.RootDomain}}/
-  # Remove gateway_pretty_url if not using pretty URL
-  gateway_pretty_url: {{.Scheme}}://user.{{.RootDomain}}/function
   # Add your custom templates by adding a coma separated URL, i.e. extend the current value with:
   # ", https://github.com/custom/template.git, https://github.com/custom/template2.git"
   custom_templates: {{ .CustomTemplates }}
@@ -23,7 +21,3 @@ environment:
 
 # Dockerfile language support
   enable_dockerfile_lang: {{.EnableDockerfileLang}}
-
-  # Set the build branch to be used by ofc
-  build_branch: {{.BuildBranch}}
-

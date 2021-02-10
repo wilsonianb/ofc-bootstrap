@@ -15,11 +15,8 @@ touch ~/Downloads/do-access-token
 
 ./bin/ofc-bootstrap apply --file example.init.yaml
 
-kubectl rollout status -n openfaas deploy/edge-router
 kubectl rollout status -n openfaas deploy/gateway
 
-kubectl rollout status -n openfaas-fn deploy/system-github-event
-kubectl rollout status -n openfaas-fn deploy/git-tar
 kubectl rollout status -n openfaas-fn deploy/list-functions
 kubectl rollout status -n openfaas-fn deploy/system-dashboard
 

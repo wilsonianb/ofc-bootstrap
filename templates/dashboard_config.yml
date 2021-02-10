@@ -10,8 +10,3 @@ environment:
   pretty_url: {{.Scheme}}://user.{{.RootDomain}}/function
   # Comment out if not using public pretty-URL
   query_pretty_url: 'true'
-  # Public URL for your GitHub app
-  # see https://github.com/settings/apps/
-  github_app_url: {{.GitHubAppUrl}}
-  # Public URL for your GitLab instance
-  gitlab_url: {{.GitLabInstance}}

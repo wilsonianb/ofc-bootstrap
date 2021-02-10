@@ -8,10 +8,6 @@ import (
 const (
 	// DefaultFeature filter is for the features which are mandatory
 	DefaultFeature = "default"
-	// GitHubFeature filter enables secrets created with the scm_github filter
-	GitHubFeature = "scm_github"
-	// GitLabFeature filter is the feature which enables secret creation for GitLab
-	GitLabFeature = "scm_gitlab"
 
 	// GCPDNS filter enables the creation of secrets for Google Cloud Platform DNS when TLS is enabled
 	GCPDNS = "gcp_dns01"
@@ -30,11 +26,6 @@ const (
 	Route53 = "route53"
 	// Cloudflare for dns_service
 	Cloudflare = "cloudflare"
-
-	// GitLabSCM repository manager name as displayed in the init.yaml file
-	GitLabSCM = "gitlab"
-	// GitHubSCM repository manager name as displayed in the init.yaml file
-	GitHubSCM = "github"
 )
 
 type Plan struct {
@@ -42,9 +33,6 @@ type Plan struct {
 	Orchestration        string                   `yaml:"orchestration,omitempty"`
 	Secrets              []KeyValueNamespaceTuple `yaml:"secrets,omitempty"`
 	RootDomain           string                   `yaml:"root_domain,omitempty"`
-	SCM                  string                   `yaml:"scm,omitempty"`
-	Github               Github                   `yaml:"github,omitempty"`
-	Gitlab               Gitlab                   `yaml:"gitlab,omitempty"`
 	TLS                  bool                     `yaml:"tls,omitempty"`
 	TLSConfig            TLSConfig                `yaml:"tls_config,omitempty"`
 	Ingress              string                   `yaml:"ingress,omitempty"`
@@ -53,7 +41,6 @@ type Plan struct {
 	ScaleToZero          bool                     `yaml:"scale_to_zero,omitempty"`
 	OpenFaaSCloudVersion string                   `yaml:"openfaas_cloud_version,omitempty"`
 	NetworkPolicies      bool                     `yaml:"network_policies,omitempty"`
-	BuildBranch          string                   `yaml:"build_branch,omitempty"`
 	IngressOperator      bool                     `yaml:"ingress_operator,omitempty"`
 	OpenFaaSOperator     bool                     `yaml:"openfaas_operator,omitempty"`
 }
@@ -103,16 +90,6 @@ type KeyValueNamespaceTuple struct {
 	Files     []FileSecret    `yaml:"files,omitempty"`
 	Type      string          `yaml:"type,omitempty"`
 	Filters   []string        `yaml:"filters,omitempty"`
-}
-
-type Github struct {
-	AppID          string `yaml:"app_id,omitempty"`
-	PrivateKeyFile string `yaml:"private_key_filename,omitempty"`
-	PublicLink     string `yaml:"public_link,omitempty"`
-}
-
-type Gitlab struct {
-	GitLabInstance string `yaml:"gitlab_instance,omitempty"`
 }
 
 type TLSConfig struct {

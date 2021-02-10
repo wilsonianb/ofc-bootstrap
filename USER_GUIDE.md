@@ -1,6 +1,6 @@
 # ofc-bootstrap user-guide
 
-You will need admin access to a Kubernetes cluster, some CLI tooling and a GitHub.com account or admin access to a self-hosted GitLab instance.
+You will need admin access to a Kubernetes cluster and some CLI tooling.
 
 ## Pre-reqs
 
@@ -43,7 +43,6 @@ k3d create --k3s-server-arg "--no-deploy=traefik"
 OpenFaaS Cloud installs, manages, and bundles software which spans source-control, TLS, and DNS. You must have the following prepared before you start your installation.
 
 * You'll need to register a domain-name and set it up for management in Google Cloud DNS, DigitalOcean, Cloudflare DNS or AWS Route 53.
-* Admin-level access to a GitHub.com account or a self-hosted GitLab installation.
 * A valid email address for use with [LetsEncrypt](https://letsencrypt.org), beware of [rate limits](https://letsencrypt.org/docs/rate-limits/).
 * Admin access to a Kubernetes cluster.
 
@@ -170,50 +169,6 @@ If you picked a root domain of `example.com`, then your URLs would correspond to
 
 After the installation has completed in a later step, you will need to create DNS A records with your DNS provider. You don't need to create these records now.
 
-## Pick your Source Control Management (SCM)
-
-Choose SCM between GitHub.com or GitLab self-hosted.
-
-For GitHub set:
-
-```yaml
-scm: github
-```
-
-For GitLab set:
-
-```yaml
-scm: gitlab
-```
-
-### Setup your GitHub or GitLab integration
-
-Setup the GitHub / GitLab App and OAuth App
-
-Your SCM will need to send webhooks to OpenFaaS Cloud's github-event or gitlab-event function for CI/CD. This is protected by a confidential secret called a *Webhook secret*. You can leave the field blank to have one generated for you, or you can set your own in `init.yaml`.
-
-* For GitHub create a GitHub App and download the private key file
-  * Read the docs for how to [configure your GitHub App](https://docs.openfaas.com/openfaas-cloud/self-hosted/github/)
-  * Leave the `value:` for `github-webhook-secret` blank for an auto-generated password, or set your own password in the GitHub App UI and in this section of the YAML.
-  * Update `init.yaml` where you see the `## User-input` section
-  * Set `app_id:` under the section named `github` with GitHub App's ID
-  * If not using a generated value, set the `github-webhook-secret` literal value with your *Webhook secret* for the GitHub App's
-  * Click *Generate a private key*, this will be downloaded to your local computer (if you ever need a new one, generate a new one and delete the old key)
-  * Update the `private-key` `value_from` to the path of the GitHub App's private key
-  * Make sure the app is "activated" using the checkbox at the bottom of the github page.
-  
-  
-* For GitLab create a System Hook
-  * Leave the `value:` for `gitlab-webhook-secret` blank, or set your own password
-  * Update the `## User-input` section including your System Hook's API Token and *Webhook secret*
-* Create your GitHub / GitLab OAuth App which is used for logging in to the dashboard
-* For GitLab update `init.yaml` with your `gitlab_instance`
-
-Alternatively, there are two automated ways you can create a GitHub App, but the GitHub OAuth configuration cannot be automated at this time.
-
-1) Fully-automatic `ofc-bootstrap create-github-app` command - this is in Alpha status, but will generate a YAML file you can use with `--file` / `-f` as an verride
-2) Semi-automatic [GitHub App generator](http://alexellis.o6s.io/github-app)
-
 ### Decide if you're using a LoadBalancer
 
 If you are using a public cloud offering and you know that they can offer a `LoadBalancer`, then the `ingress:` field will be set to `loadbalancer` which is the default.
@@ -269,11 +224,6 @@ When this value is set to `false`, your users can only use your recommended set 
 
 If you want your functions to scale to zero then you need to set `scale_to_zero: true`.
 
-### Set the branch that will be built and deployed (optional)
-
-If you wish to deploy a branch other than master you can edit `build_branch` and set it to your desired branch.
-
-The default branch is `master`
 ## Set the OpenFaaS Cloud version (optional)
 
 This value should normally be left as per the number in the master branch, however you can edit `openfaas_cloud_version` if required.
@@ -312,34 +262,6 @@ When ofc-bootstrap has completed and you know the IP of your LoadBalancer:
 * `auth.system.example.com`
 * `*.example.com`
 
-## Configure the GitHub / GitLab App Webhook
-
-Now over on GitHub / GitLab enter the URL for webhooks:
-
-GitHub.com:
-
-```
-http://system.example.com/github-event
-```
-
-GitLab self-hosted:
-
-```
-http://system.example.com/gitlab-event
-```
-
-For more details see the [GitLab instructions](https://github.com/openfaas/openfaas-cloud/blob/master/docs/GITLAB.md) in OpenFaaS Cloud.
-
-Then you need to enter the Webhook secret that was generated during the bootstrap process. Run the following commands to extract and decode it:
-
-```sh
-export SECRET=$(kubectl get secret -n openfaas-fn github-webhook-secret -o jsonpath="{.data.github-webhook-secret}" | base64 --decode; echo)
-
-echo "Your webhook secret is: $SECRET"
-```
-
-Open the Github App UI and paste in the value into the "Webhook Secret" field.
-
 ## Smoke-test
 
 Now check the following and run a smoke test:
@@ -348,36 +270,11 @@ Now check the following and run a smoke test:
 * Check TLS certificates are issued as expected
 * Check that your endpoint can be accessed 
 
-## View your dashboard
-
-Now view your dashboard over at:
-
-```
-http://system.example.com/dashboard/<username>
-```
-
-Just replace `<username>` with your GitHub account. 
-> If you have enabled OAuth you only need to navigate to system.example.com
-
-## Trigger a build
-
-Now you can install your GitHub app on a repo, run `faas-cli new` and then rename the YAML file to `stack.yml` and do a `git push`. Your OpenFaaS Cloud cluster will build and deploy the functions found in that GitHub repo.
-
-If you're unsure how to do this, then you could use the [QuickStart for the Community Cluster](https://github.com/openfaas/community-cluster/tree/master/docs), just remember to change the URLs to your own cluster.
-
-## Something went wrong?
-
-If you think that everything is set up correctly but want to troubleshoot then head over to the GitHub App webpage and click "Advanced" - here you can find each request/response from the GitHub push events. You can resend them or view any errors.
-
-## Still not working? 
-
-Follow the detailed [Troubleshooting Guide](https://docs.openfaas.com/openfaas-cloud/self-hosted/troubleshoot/#still-not-working) in the OpenFaaS docs. If you are still stuck after that please chat with us in #openfas-cloud on Slack.
-
 ## Access your OpenFaaS UI or API
 
 OpenFaaS Cloud abstracts away the core OpenFaaS UI and API. Your new API is driven by pushing changes into a Git repository, rather than running commands, or browsing a UI.
 
-You may still want access to your OpenFaaS cluster, in which case run the following:
+To access to your OpenFaaS cluster, run the following:
 
 ```sh
 # Fetch your generated admin password:
@@ -403,7 +300,6 @@ If you run the step above `Access your OpenFaaS UI or API`, then you can edit se
 cd tmp/openfaas-cloud/
 
 # Edit stack.yml
-# Edit github.yml or gitlab.yml
 # Edit gateway_config.yml
 # Edit buildshiprun_limits.yml
 

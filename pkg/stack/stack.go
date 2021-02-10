@@ -9,30 +9,22 @@ import (
 	"github.com/openfaas/ofc-bootstrap/pkg/types"
 )
 
-type gitlabConfig struct {
-	GitLabInstance string `yaml:"gitlab_instance,omitempty"`
-}
-
 type gatewayConfig struct {
 	RootDomain           string
 	Scheme               string
 	CustomTemplates      string
 	EnableDockerfileLang bool
-	BuildBranch          string
 }
 
 type authConfig struct {
 }
 
 type stackConfig struct {
-	GitHub bool
 }
 
 type dashboardConfig struct {
-	RootDomain     string
-	Scheme         string
-	GitHubAppUrl   string
-	GitLabInstance string
+	RootDomain string
+	Scheme     string
 }
 
 // Apply creates `templates/gateway_config.yml` to be referenced by stack.yml
@@ -47,37 +39,13 @@ func Apply(plan types.Plan) error {
 		Scheme:               scheme,
 		CustomTemplates:      plan.Deployment.FormatCustomTemplates(),
 		EnableDockerfileLang: plan.EnableDockerfileLang,
-		BuildBranch:          plan.BuildBranch,
 	}); gwConfigErr != nil {
 		return gwConfigErr
 	}
 
-	if githubConfigErr := generateTemplate("github", plan, types.Github{
-		AppID:          plan.Github.AppID,
-		PrivateKeyFile: plan.Github.PrivateKeyFile,
-	}); githubConfigErr != nil {
-		return githubConfigErr
-	}
-
-	if plan.SCM == "gitlab" {
-		if gitlabConfigErr := generateTemplate("gitlab", plan, gitlabConfig{
-			GitLabInstance: plan.Gitlab.GitLabInstance,
-		}); gitlabConfigErr != nil {
-			return gitlabConfigErr
-		}
-	}
-
-	var gitHubAppUrl, gitLabInstance string
-	if plan.SCM == types.GitHubSCM {
-		gitHubAppUrl = plan.Github.PublicLink
-	} else if plan.SCM == types.GitLabSCM {
-		gitLabInstance = plan.Gitlab.GitLabInstance
-	}
 	dashboardConfigErr := generateTemplate("dashboard_config", plan, dashboardConfig{
-		RootDomain:     plan.RootDomain,
-		Scheme:         scheme,
-		GitHubAppUrl:   gitHubAppUrl,
-		GitLabInstance: gitLabInstance,
+		RootDomain: plan.RootDomain,
+		Scheme:     scheme,
 	})
 	if dashboardConfigErr != nil {
 		return dashboardConfigErr
@@ -87,10 +55,7 @@ func Apply(plan types.Plan) error {
 		return ofAuthDepErr
 	}
 
-	isGitHub := plan.SCM == "github"
-	if stackErr := generateTemplate("stack", plan, stackConfig{
-		GitHub: isGitHub,
-	}); stackErr != nil {
+	if stackErr := generateTemplate("stack", plan, stackConfig{}); stackErr != nil {
 		return stackErr
 	}
 

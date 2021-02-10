@@ -22,42 +22,6 @@ secrets:
   ### and your desired configuration.
   ### For more information see: https://github.com/openfaas/openfaas-cloud/tree/master/docs
 
-  ## This value is used by Github to talk to system-github-event, the password will be
-  ## generated if left blank. Alternatively, you can enter a password here of your own.
-  ## Enter it into the GitHub App's UI.
-  - name: "github-webhook-secret"
-    literals:
-      - name: "github-webhook-secret"
-        value: ""
-    filters:
-      - "scm_github"
-    namespace: "openfaas-fn"
-
-  # Download from GitHub App on GitHub UI
-  - name: "private-key"
-    files:
-      - name: "private-key"
-        value_from: "~/Downloads/private-key.pem"
-    filters:
-      - "scm_github"
-    namespace: "openfaas-fn"
-
-  # Enter your GitLab Webhook secret and API token
-  - name: "gitlab-webhook-secret"
-    literals:
-      - name: "gitlab-webhook-secret"
-        value: ""
-    filters:
-      - "scm_gitlab"
-    namespace: "openfaas-fn"
-  - name: "gitlab-api-token"
-    literals:
-      - name: "gitlab-api-token"
-        value: "token"
-    filters:
-      - "scm_gitlab"
-    namespace: "openfaas-fn"
-
  # DNS Service Account secret for DNS01 (wildcard) challenge
 
   ## Use DigitalOcean
@@ -120,21 +84,6 @@ deployment:
     - "https://github.com/openfaas-incubator/python-flask-template.git"
     - "https://github.com/openfaas-incubator/ruby-http"
 
-## Source Control Management
-### Pick either github or gitlab
-scm: github
-# scm: gitlab
-
-## Populate from GitHub App
-github:
-  app_id: "24304"
-  public_link: "https://github.com/apps/o6s-io"
-
-## GitLab
-### Public URL for your GitLab instance with a trailing slash
-gitlab:
-  gitlab_instance: "https://gitlab.o6s.io/"
-
 ## TLS
 tls: false
 tls_config:
@@ -174,10 +123,6 @@ scale_to_zero: false
 ### Prevents functions from talking to the openfaas namespace, and to each other.
 ### Use the ingress address for the gateway or the external IP instead.
 network_policies: false
-
-## Branch that OpenFaaS Cloud will build and deploy
-## You should change this if you want a different branch to be built and deployed instead of master
-build_branch: master
 
 ## This setting, if true, will install the openfaas ingress-operator using the openfaas-fn namespace
 ## for finding functions, creating Ingress records in the openfaas namespace

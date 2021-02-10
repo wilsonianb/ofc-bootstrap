@@ -10,34 +10,22 @@ import (
 )
 
 type gitlabConfig struct {
-	GitLabInstance      string `yaml:"gitlab_instance,omitempty"`
-	CustomersSecretPath string
+	GitLabInstance string `yaml:"gitlab_instance,omitempty"`
 }
 
 type gatewayConfig struct {
 	RootDomain           string
-	CustomersURL         string
 	Scheme               string
 	CustomTemplates      string
 	EnableDockerfileLang bool
 	BuildBranch          string
-	CustomersSecretPath  string
 }
 
 type authConfig struct {
-	RootDomain            string
-	ClientId              string
-	CustomersURL          string
-	Scheme                string
-	OAuthProvider         string
-	OAuthProviderBaseURL  string
-	OFCustomersSecretPath string
-	TLSEnabled            bool
 }
 
 type stackConfig struct {
-	GitHub              bool
-	CustomersSecretPath string
+	GitHub bool
 }
 
 type dashboardConfig struct {
@@ -54,15 +42,8 @@ func Apply(plan types.Plan) error {
 		scheme += "s"
 	}
 
-	customersSecretPath := ""
-
-	if plan.CustomersSecret {
-		customersSecretPath = "/var/openfaas/secrets/customers"
-	}
-
 	if gwConfigErr := generateTemplate("gateway_config", plan, gatewayConfig{
 		RootDomain:           plan.RootDomain,
-		CustomersURL:         plan.CustomersURL,
 		Scheme:               scheme,
 		CustomTemplates:      plan.Deployment.FormatCustomTemplates(),
 		EnableDockerfileLang: plan.EnableDockerfileLang,
@@ -80,8 +61,7 @@ func Apply(plan types.Plan) error {
 
 	if plan.SCM == "gitlab" {
 		if gitlabConfigErr := generateTemplate("gitlab", plan, gitlabConfig{
-			GitLabInstance:      plan.Gitlab.GitLabInstance,
-			CustomersSecretPath: customersSecretPath,
+			GitLabInstance: plan.Gitlab.GitLabInstance,
 		}); gitlabConfigErr != nil {
 			return gitlabConfigErr
 		}
@@ -103,30 +83,13 @@ func Apply(plan types.Plan) error {
 		return dashboardConfigErr
 	}
 
-	if plan.EnableOAuth {
-		ofCustomersSecretPath := ""
-		if plan.CustomersSecret {
-			ofCustomersSecretPath = "/var/secrets/of-customers/of-customers"
-		}
-
-		if ofAuthDepErr := generateTemplate("edge-auth-dep", plan, authConfig{
-			RootDomain:            plan.RootDomain,
-			ClientId:              plan.OAuth.ClientId,
-			CustomersURL:          plan.CustomersURL,
-			Scheme:                scheme,
-			OAuthProvider:         plan.SCM,
-			OAuthProviderBaseURL:  plan.OAuth.OAuthProviderBaseURL,
-			OFCustomersSecretPath: ofCustomersSecretPath,
-			TLSEnabled:            plan.TLS,
-		}); ofAuthDepErr != nil {
-			return ofAuthDepErr
-		}
+	if ofAuthDepErr := generateTemplate("edge-auth-dep", plan, authConfig{}); ofAuthDepErr != nil {
+		return ofAuthDepErr
 	}
 
 	isGitHub := plan.SCM == "github"
 	if stackErr := generateTemplate("stack", plan, stackConfig{
-		GitHub:              isGitHub,
-		CustomersSecretPath: customersSecretPath,
+		GitHub: isGitHub,
 	}); stackErr != nil {
 		return stackErr
 	}

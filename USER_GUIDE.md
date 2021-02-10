@@ -46,7 +46,6 @@ OpenFaaS Cloud installs, manages, and bundles software which spans source-contro
 * Admin-level access to a GitHub.com account or a self-hosted GitLab installation.
 * A valid email address for use with [LetsEncrypt](https://letsencrypt.org), beware of [rate limits](https://letsencrypt.org/docs/rate-limits/).
 * Admin access to a Kubernetes cluster.
-* The ability to create one or more git repositories - one will be for your `CUSTOMERS` Access-Control List ACL and the other will be your test repository to check that everything worked.
 
 ### Tools
 
@@ -212,21 +211,8 @@ Your SCM will need to send webhooks to OpenFaaS Cloud's github-event or gitlab-e
 
 Alternatively, there are two automated ways you can create a GitHub App, but the GitHub OAuth configuration cannot be automated at this time.
 
-1) Fully-automatic `ofc-bootstrap create-github-app` command - this is in Alpha status, but will generate a YAML file you can use with `--file` / `-f` as an override
+1) Fully-automatic `ofc-bootstrap create-github-app` command - this is in Alpha status, but will generate a YAML file you can use with `--file` / `-f` as an verride
 2) Semi-automatic [GitHub App generator](http://alexellis.o6s.io/github-app)
-
-### Setup your access control
-
-Access control to your OFC is controlled by a text file containing a list of valid usernames or organisations. This list only needs to contain organisation names, or the names of the users who are hosting repositories that OFC will manage.
-
-Create a new GitHub repository with a CUSTOMERS Access Control List (ACL) file.
-
-> Note: This repository should not contain any code or functions.
-
-* Create a new public GitHub repo
-* Add a file named `CUSTOMERS` and place each username or GitHub org you will use on a separate line
-* Find the GitHub "raw" URL (CDN)
-* Copy and paste the raw URL into th `init.yaml` file in `customers_url: `
 
 ### Decide if you're using a LoadBalancer
 
@@ -236,20 +222,6 @@ If you are deploying to a cloud or Kubernetes cluster where the type `LoadBalanc
 
 > Note: it is a common error for new users to try to access the dashboard using the IP address of the load-balancer.
 > You must use the DNS name for the dashboard: i.e. `system.example.com/dashboard/username`
-
-### Use authz (recommended)
-
-If you'd like to restrict who can log in to just those who use a GitHub account then create a GitHub OAuth App or the equivalent in GitLab.
-
-* Set `enable_oauth: ` to `true`
-
-> This feature is optional, but highly recommended
-
-Enable `auth` and fill out the OAuth App `client_id`. Configure `of-client-secret` with the OAuth App Client Secret.
-For GitLab set your `oauth_provider_base_url`.
-
-* Set `client_id: ` in the `oauth: ` section with the value of your OAuth `client_id`
-* Set `of-client-secret` in the secrets section at the top of the file using the value from your OAuth `client_secret`
 
 ### Use TLS (recommended)
 
@@ -286,12 +258,6 @@ You can start out by using the Staging issuer, then switch to the production iss
 > Hint: For aws route53 DNS, create your secret key file `~/Downloads/route53-secret-access-key` (the default location) with only the secret access key, no newline and no other characters.
 
 > Note if you want to switch from the staging TLS certificates to production certificates, see the appendix.
-
-### Use a Kubernetes secret instead of a customers URL (optional)
-
-If you want to keep your list of users private, you can use a Kubernetes secret instead.
-
-Set `customers_secret:` to `true` and then edit the two secrets `customers` and `of-customers`.
 
 ### Enable dockerfile language support (optional)
 
@@ -446,15 +412,6 @@ faas-cli deploy -f stack.yml
 
 # Update a single function, such as "buildshiprun"
 faas-cli deploy -f stack.yml --filter=buildshiprun
-```
-
-## Invite your team
-
-For each user or org you want to enroll into your OpenFaaS Cloud edit the `CUSTOMERS` ACL file and add their username on a new line.
-
-```
-openfaas
-alexellis
 ```
 
 ## Switch from staging to production TLS

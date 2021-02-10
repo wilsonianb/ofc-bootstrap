@@ -638,11 +638,6 @@ func cloneCloudComponents(tag string) error {
 
 func deployCloudComponents(plan types.Plan) error {
 
-	authEnv := ""
-	if plan.EnableOAuth {
-		authEnv = "ENABLE_OAUTH=true"
-	}
-
 	gitlabEnv := ""
 	if plan.SCM == "gitlab" {
 		gitlabEnv = "GITLAB=true"
@@ -656,7 +651,7 @@ func deployCloudComponents(plan types.Plan) error {
 	task := execute.ExecTask{
 		Command: "./scripts/deploy-cloud-components.sh",
 		Shell:   true,
-		Env: []string{authEnv,
+		Env: []string{
 			gitlabEnv,
 			networkPoliciesEnv,
 		},
@@ -699,10 +694,6 @@ func filterFeatures(plan types.Plan) (types.Plan, error) {
 		if err != nil {
 			return plan, fmt.Errorf("Error while filtering features: %s", err.Error())
 		}
-	}
-
-	if plan.EnableOAuth == true {
-		plan.Features = append(plan.Features, types.Auth)
 	}
 
 	return plan, err

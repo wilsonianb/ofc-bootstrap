@@ -13,20 +13,17 @@ functions:
       com.openfaas.scale.zero: false
     environment:
       content_type: text/plain
-      validate_customers: true
       validate_token: false
       write_debug: true
       read_debug: true
       installation_tag: "openfaas-cloud"
       gitlab_instance: "{{.GitLabInstance}}"
-      customers_path: "{{.CustomersSecretPath}}"
     environment_file:
       - gateway_config.yml
     secrets:
       - gitlab-webhook-secret
       - payload-secret
       - gitlab-api-token
-      - customers
 
   gitlab-push:
     lang: go

@@ -64,7 +64,6 @@ Status:
 * [x] Make TLS optional in the Ingress config (not to get rate-limited by LetsEncrypt)
 * [x] init.yml - add `github_app_id` and `WEBHOOK_SECRET`
 * [x] Create basic-auth secrets for the functions in `openfaas-fn`
-* [x] init.yml - define and OAuth App and load via struct
 * [x] Step: generate secrets and keys for the auth service (see auth/README.md)
 * [x] Template: auth service deployment YAML file
 * [x] Refactor: Generate passwords via Golang code or library

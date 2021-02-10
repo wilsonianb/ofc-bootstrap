@@ -16,22 +16,6 @@ secrets:
     filters:
       - "default"
     namespace: "openfaas"
-  - name: "jwt-private-key"
-    files:
-      - name: "key"
-        value_from: "./tmp/key"
-        value_command: "openssl ecparam -genkey -name prime256v1 -noout -out ./tmp/key"
-    filters:
-      - "auth"
-    namespace: "openfaas"
-  - name: "jwt-public-key"
-    files:
-      - name: "key.pub"
-        value_from: "./tmp/key.pub"
-        value_command: "openssl ec -in ./tmp/key -pubout -out ./tmp/key.pub"
-    filters:
-      - "auth"
-    namespace: "openfaas"
 
   ### User-input
   ### In this section, you must populate all your secrets or secret file-locations
@@ -57,14 +41,6 @@ secrets:
     filters:
       - "scm_github"
     namespace: "openfaas-fn"
-  # Populate your OAuth client_secret
-  - name: "of-client-secret"
-    literals:
-      - name: of-client-secret
-        value: "79163355e553b477957d977b0b8addd3c42ff52d"
-    filters:
-      - "auth"
-    namespace: "openfaas"
 
   # Enter your GitLab Webhook secret and API token
   - name: "gitlab-webhook-secret"
@@ -124,27 +100,6 @@ secrets:
       - "cloudflare_dns01"
     namespace: "cert-manager"
 
-## If not using a HTTPS URL, then set a list of CUSTOMERS
-## To use this set "value_from" to a real file path, and put in a list (each item on a new line) of usernames, without other whitespace
-  - name: "of-customers"
-    files:
-      - name: "of-customers"
-        value_from: "/dev/null"
-    namespace: "openfaas"
-    filters:
-      - "default"
-  - name: "customers"
-    files:
-      - name: "customers"
-        value_from: "/dev/null"
-    namespace: "openfaas-fn"
-    filters:
-      - "default"
-
-### Use a secret instead of a publicly accessible URL for the ACL
-### of valid users.
-customers_secret: false
-
 ### Your root DNS domain name, this can be a sub-domain i.e. staging.o6s.io / prod.o6s.io
 root_domain: "myfaas.club"
 
@@ -179,27 +134,6 @@ github:
 ### Public URL for your GitLab instance with a trailing slash
 gitlab:
   gitlab_instance: "https://gitlab.o6s.io/"
-
-
-## Enable auth:
-### When enabled users must log in with a valid GitHub account and be present in the
-### customers file to view any dashboard
-enable_oauth: false
-
-## Populate from OAuth App
-oauth:
-  client_id: clientid
-
-  ## For GitLab put your OAuth provider base URL
-  # oauth_provider_base_url: "https://gitlab.o6s.io"
-
-  ## For GitHub leave blank
-  oauth_provider_base_url: ""
-
-### Users allowed to access your OpenFaaS Cloud
-#### ACL for your users, it must be a raw text file or GitHub RAW URL
-#### At time of writing this _must_ be a public repo URL
-customers_url: "https://raw.githubusercontent.com/openfaas/openfaas-cloud/master/CUSTOMERS"
 
 ## TLS
 tls: false

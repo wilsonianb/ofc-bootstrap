@@ -10,7 +10,6 @@ environment:
   custom_templates: {{ .CustomTemplates }}
 
 # Security
-  customers_url: "{{.CustomersURL}}"
   basic_auth: true
   secret_mount_path: /var/openfaas/secrets
 

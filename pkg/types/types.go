@@ -13,9 +13,6 @@ const (
 	// GitLabFeature filter is the feature which enables secret creation for GitLab
 	GitLabFeature = "scm_gitlab"
 
-	// Auth filter enables OAuth secret creation
-	Auth = "auth"
-
 	// GCPDNS filter enables the creation of secrets for Google Cloud Platform DNS when TLS is enabled
 	GCPDNS = "gcp_dns01"
 	// DODNS filter enables the creation of secrets for Digital Ocean DNS when TLS is enabled
@@ -45,13 +42,10 @@ type Plan struct {
 	Orchestration        string                   `yaml:"orchestration,omitempty"`
 	Secrets              []KeyValueNamespaceTuple `yaml:"secrets,omitempty"`
 	RootDomain           string                   `yaml:"root_domain,omitempty"`
-	CustomersURL         string                   `yaml:"customers_url,omitempty"`
 	SCM                  string                   `yaml:"scm,omitempty"`
 	Github               Github                   `yaml:"github,omitempty"`
 	Gitlab               Gitlab                   `yaml:"gitlab,omitempty"`
 	TLS                  bool                     `yaml:"tls,omitempty"`
-	OAuth                OAuth                    `yaml:"oauth,omitempty"`
-	EnableOAuth          bool                     `yaml:"enable_oauth,omitempty"`
 	TLSConfig            TLSConfig                `yaml:"tls_config,omitempty"`
 	Ingress              string                   `yaml:"ingress,omitempty"`
 	Deployment           Deployment               `yaml:"deployment,omitempty"`
@@ -60,7 +54,6 @@ type Plan struct {
 	OpenFaaSCloudVersion string                   `yaml:"openfaas_cloud_version,omitempty"`
 	NetworkPolicies      bool                     `yaml:"network_policies,omitempty"`
 	BuildBranch          string                   `yaml:"build_branch,omitempty"`
-	CustomersSecret      bool                     `yaml:"customers_secret,omitempty"`
 	IngressOperator      bool                     `yaml:"ingress_operator,omitempty"`
 	OpenFaaSOperator     bool                     `yaml:"openfaas_operator,omitempty"`
 }
@@ -120,11 +113,6 @@ type Github struct {
 
 type Gitlab struct {
 	GitLabInstance string `yaml:"gitlab_instance,omitempty"`
-}
-
-type OAuth struct {
-	ClientId             string `yaml:"client_id,omitempty"`
-	OAuthProviderBaseURL string `yaml:"oauth_provider_base_url,omitempty"`
 }
 
 type TLSConfig struct {

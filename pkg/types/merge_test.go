@@ -47,7 +47,7 @@ func Test_mergePlans_MergeEmptyItemsFromBoth(t *testing.T) {
 	}
 
 	plan2 := Plan{
-		CustomersURL: "https://127.0.0.1:8443/customers",
+		RootDomain: "myfaas.club",
 	}
 
 	planOut, err := MergePlans([]Plan{plan1, plan2})
@@ -61,8 +61,8 @@ func Test_mergePlans_MergeEmptyItemsFromBoth(t *testing.T) {
 		t.Errorf("OpenFaaSCloudVersion want: %s, but got: %s", plan1.OpenFaaSCloudVersion, planOut.OpenFaaSCloudVersion)
 	}
 
-	if planOut.CustomersURL != plan2.CustomersURL {
-		t.Errorf("CustomersURL want: %s, but got: %s", plan2.CustomersURL, planOut.CustomersURL)
+	if planOut.RootDomain != plan2.RootDomain {
+		t.Errorf("RootDomain want: %s, but got: %s", plan2.RootDomain, planOut.RootDomain)
 	}
 }
 

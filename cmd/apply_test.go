@@ -91,9 +91,8 @@ func Test_filterFeatures(t *testing.T) {
 				TLSConfig: types.TLSConfig{
 					DNSService: types.Route53,
 				},
-				EnableOAuth: true,
 			},
-			expectedFeatures: []string{types.DefaultFeature, types.GitHubFeature, types.Auth, types.Route53DNS},
+			expectedFeatures: []string{types.DefaultFeature, types.GitHubFeature, types.Route53DNS},
 			expectedError:    nil,
 		},
 		{
@@ -104,9 +103,8 @@ func Test_filterFeatures(t *testing.T) {
 				TLSConfig: types.TLSConfig{
 					DNSService: types.Route53,
 				},
-				EnableOAuth: true,
 			},
-			expectedFeatures: []string{types.DefaultFeature, types.GitLabFeature, types.Auth, types.Route53DNS},
+			expectedFeatures: []string{types.DefaultFeature, types.GitLabFeature, types.Route53DNS},
 			expectedError:    nil,
 		},
 		{
@@ -116,22 +114,20 @@ func Test_filterFeatures(t *testing.T) {
 				TLSConfig: types.TLSConfig{
 					DNSService: types.Route53,
 				},
-				EnableOAuth: true,
 			},
 			expectedFeatures: []string{types.DefaultFeature},
 			expectedError:    errors.New("Error while filtering features"),
 		},
 		{
-			title: "Auth and TLS are enabled along with GitLab",
+			title: "TLS is enabled along with GitLab",
 			planConfig: types.Plan{
 				TLS: true,
 				TLSConfig: types.TLSConfig{
 					DNSService: types.Route53,
 				},
-				EnableOAuth: true,
-				SCM:         types.GitHubSCM,
+				SCM: types.GitHubSCM,
 			},
-			expectedFeatures: []string{types.DefaultFeature, types.Auth, types.Route53DNS},
+			expectedFeatures: []string{types.DefaultFeature, types.Route53DNS},
 			expectedError:    nil,
 		},
 	}

@@ -110,10 +110,6 @@ tls_config:
   ### Cloudflare
   # dns_service: cloudflare
 
-## Dockerfile language support
-### Use with caution, it allows any workload to be built and run
-enable_dockerfile_lang: false
-
 ## Set to true to enable scaling to zero
 ### When enabled, all functions are included by default, to turn off add a label
 ### of com.openfaas.scale.zero: "false"

@@ -10,10 +10,9 @@ import (
 )
 
 type gatewayConfig struct {
-	RootDomain           string
-	Scheme               string
-	CustomTemplates      string
-	EnableDockerfileLang bool
+	RootDomain      string
+	Scheme          string
+	CustomTemplates string
 }
 
 type authConfig struct {
@@ -35,10 +34,9 @@ func Apply(plan types.Plan) error {
 	}
 
 	if gwConfigErr := generateTemplate("gateway_config", plan, gatewayConfig{
-		RootDomain:           plan.RootDomain,
-		Scheme:               scheme,
-		CustomTemplates:      plan.Deployment.FormatCustomTemplates(),
-		EnableDockerfileLang: plan.EnableDockerfileLang,
+		RootDomain:      plan.RootDomain,
+		Scheme:          scheme,
+		CustomTemplates: plan.Deployment.FormatCustomTemplates(),
 	}); gwConfigErr != nil {
 		return gwConfigErr
 	}

@@ -214,12 +214,6 @@ You can start out by using the Staging issuer, then switch to the production iss
 
 > Note if you want to switch from the staging TLS certificates to production certificates, see the appendix.
 
-### Enable dockerfile language support (optional)
-
-If you are planning on building functions using the `dockerfile` template you need to set `enable_dockerfile_lang: true`.
-
-When this value is set to `false`, your users can only use your recommended set of templates.
-
 ### Enable scaling to zero
 
 If you want your functions to scale to zero then you need to set `scale_to_zero: true`.

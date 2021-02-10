@@ -37,7 +37,6 @@ type Plan struct {
 	TLSConfig            TLSConfig                `yaml:"tls_config,omitempty"`
 	Ingress              string                   `yaml:"ingress,omitempty"`
 	Deployment           Deployment               `yaml:"deployment,omitempty"`
-	EnableDockerfileLang bool                     `yaml:"enable_dockerfile_lang,omitempty"`
 	ScaleToZero          bool                     `yaml:"scale_to_zero,omitempty"`
 	OpenFaaSCloudVersion string                   `yaml:"openfaas_cloud_version,omitempty"`
 	NetworkPolicies      bool                     `yaml:"network_policies,omitempty"`

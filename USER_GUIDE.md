@@ -323,12 +323,6 @@ For GitLab set your `oauth_provider_base_url`.
 * Set `client_id: ` in the `oauth: ` section with the value of your OAuth `client_id`
 * Set `of-client-secret` in the secrets section at the top of the file using the value from your OAuth `client_secret`
 
-### Customise s3 (not recommended)
-
-By default OpenFaaS Cloud will deploy Minio to keep track of your build logs. This can be customised to point at any compatible object storage service such as AWS S3 or DigitalOcean Spaces.
-
-Set `s3_url`, `s3_region` `s3_tls` and `s3_bucket` with appropriate values.
-
 ### Use TLS (recommended)
 
 OpenFaaS Cloud can use cert-manager to automatically provision TLS certificates for your OpenFaaS Cloud cluster using the DNS01 challenge.

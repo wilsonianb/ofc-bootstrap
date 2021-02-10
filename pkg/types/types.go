@@ -55,7 +55,6 @@ type Plan struct {
 	Gitlab               Gitlab                   `yaml:"gitlab,omitempty"`
 	TLS                  bool                     `yaml:"tls,omitempty"`
 	OAuth                OAuth                    `yaml:"oauth,omitempty"`
-	S3                   S3                       `yaml:"s3,omitempty"`
 	EnableOAuth          bool                     `yaml:"enable_oauth,omitempty"`
 	TLSConfig            TLSConfig                `yaml:"tls_config,omitempty"`
 	Slack                Slack                    `yaml:"slack,omitempty"`
@@ -137,13 +136,6 @@ type Slack struct {
 type OAuth struct {
 	ClientId             string `yaml:"client_id,omitempty"`
 	OAuthProviderBaseURL string `yaml:"oauth_provider_base_url,omitempty"`
-}
-
-type S3 struct {
-	Url    string `yaml:"s3_url,omitempty"`
-	Region string `yaml:"s3_region,omitempty"`
-	TLS    bool   `yaml:"s3_tls,omitempty"`
-	Bucket string `yaml:"s3_bucket,omitempty"`
 }
 
 type TLSConfig struct {

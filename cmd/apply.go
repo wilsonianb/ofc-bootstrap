@@ -37,7 +37,6 @@ func init() {
 
 	applyCmd.Flags().StringArrayP("file", "f", []string{""}, "A number of init.yaml plan files")
 	applyCmd.Flags().Bool("skip-sealedsecrets", false, "Skip SealedSecrets installation")
-	applyCmd.Flags().Bool("skip-minio", false, "Skip Minio installation")
 	applyCmd.Flags().Bool("skip-create-secrets", false, "Skip creating secrets")
 	applyCmd.Flags().Bool("print-plan", false, "Print merged plan and exit")
 }
@@ -50,7 +49,6 @@ var applyCmd = &cobra.Command{
 }
 
 type InstallPreferences struct {
-	SkipMinio         bool
 	SkipSealedSecrets bool
 	SkipCreateSecrets bool
 }
@@ -71,10 +69,6 @@ func runApplyCommandE(command *cobra.Command, _ []string) error {
 		return err
 	}
 
-	prefs.SkipMinio, err = command.Flags().GetBool("skip-minio")
-	if err != nil {
-		return err
-	}
 	prefs.SkipSealedSecrets, err = command.Flags().GetBool("skip-sealedsecrets")
 	if err != nil {
 		return err
@@ -295,20 +289,6 @@ func process(plan types.Plan, prefs InstallPreferences) error {
 	saErr := patchFnServiceaccount()
 	if saErr != nil {
 		log.Println(saErr)
-	}
-
-	if !prefs.SkipMinio {
-		accessKey, secretKey, err := getS3Credentials()
-		if err != nil {
-			return errors.Wrap(err, "getS3Credentials")
-		}
-
-		if len(accessKey) == 0 || len(secretKey) == 0 {
-			return fmt.Errorf("S3 secrets returned from getS3Credentials were empty, but should have been generated")
-		}
-		if err := installMinio(accessKey, secretKey); err != nil {
-			return errors.Wrap(err, "installMinio")
-		}
 	}
 
 	if plan.TLS {
@@ -574,73 +554,6 @@ func installOpenfaas(scaleToZero, ingressOperator, openfaasOperator bool) error 
 		log.Printf("stderr: %s\n", res.Stderr)
 	}
 
-	return nil
-}
-
-func getS3Credentials() (string, string, error) {
-	args := []string{"get", "secret", "-n", "openfaas-fn", "s3-access-key", "-o", "jsonpath={.data.s3-access-key}"}
-	res, err := k8s.KubectlTask(args...)
-	if err != nil {
-		return "", "", err
-	}
-	if res.ExitCode != 0 {
-		return "", "", fmt.Errorf("error getting s3 secret %s / %s", res.Stderr, res.Stdout)
-	}
-
-	decoded, _ := b64.StdEncoding.DecodeString(res.Stdout)
-	accessKey := decoded
-
-	args = []string{"get", "secret", "-n", "openfaas-fn", "s3-secret-key", "-o", "jsonpath={.data.s3-secret-key}"}
-	res, err = k8s.KubectlTask(args...)
-	if err != nil {
-		return "", "", err
-	}
-	if res.ExitCode != 0 {
-		return "", "", fmt.Errorf("error getting s3 secret %s / %s", res.Stderr, res.Stdout)
-	}
-
-	decoded, _ = b64.StdEncoding.DecodeString(res.Stdout)
-	secretKey := decoded
-
-	return string(accessKey), string(secretKey), nil
-}
-
-func installMinio(accessKey, secretKey string) error {
-	log.Println("Installing minio")
-
-	// # Minio has a default requests value of 4Gi RAM
-	// # https://github.com/minio/charts/blob/master/minio/values.yaml
-
-	args := []string{"install", "minio",
-		"--namespace=openfaas",
-		"--set persistence.enabled=false",
-		"--set service.port=9000",
-		"--set service.type=ClusterIP",
-		"--set resources.requests.memory=512Mi",
-		"--access-key=" + accessKey,
-		"--secret-key=" + secretKey,
-		"--wait",
-	}
-
-	task := execute.ExecTask{
-		Command:     "arkade",
-		Args:        args,
-		Shell:       true,
-		StreamStdio: false,
-	}
-
-	res, err := task.Execute()
-	if err != nil {
-		return err
-	}
-
-	if res.ExitCode != 0 {
-		return fmt.Errorf("non-zero exit-code: %s %s", res.Stdout, res.Stderr)
-	}
-
-	if len(res.Stderr) > 0 {
-		log.Printf("stderr: %s\n", res.Stderr)
-	}
 	return nil
 }
 

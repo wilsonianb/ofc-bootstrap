@@ -28,7 +28,7 @@ The ofc-bootstrap tool is used to install OpenFaaS Cloud in a single click. You 
 
 ![](./docs/ofc-bootstrap.png)
 
-> ofc-bootstrap packages a number of primitives such as an IngressController, a way to obtain certificates from LetsEncrypt, the OpenFaaS Cloud components, OpenFaaS itself and Minio for build log storage. Each component is interchangeable.
+> ofc-bootstrap packages a number of primitives such as an IngressController, a way to obtain certificates from LetsEncrypt, the OpenFaaS Cloud components, and OpenFaaS itself. Each component is interchangeable.
 
 ### Video demo
 

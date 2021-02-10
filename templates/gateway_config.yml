@@ -20,12 +20,6 @@ environment:
   push_repository_url: {{.Registry}}
   builder_url: http://of-builder.openfaas:8080/
 
-# Logging
-  s3_url: {{.S3.Url}}
-  s3_region: {{.S3.Region}}
-  s3_tls: {{.S3.TLS}}
-  s3_bucket: {{.S3.Bucket}}
-
 # Function policy
   readonly_root_filesystem: true
   scaling_min_limit: 1

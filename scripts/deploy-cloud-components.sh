@@ -23,6 +23,11 @@ export PAYLOAD_SECRET=$(kubectl get secret -n openfaas payload-secret -o jsonpat
 kubectl create secret generic payload-secret -n openfaas-fn --from-literal payload-secret="$PAYLOAD_SECRET" \
  --dry-run=client -o yaml | kubectl apply -f -
 
+export REDIS_PASSWORD=$(kubectl get secret -n openfaas redis -o jsonpath='{.data.redis-password}'| base64 --decode)
+
+kubectl create secret generic redis-password -n openfaas-fn --from-literal redis-password="$REDIS_PASSWORD" \
+ --dry-run=client -o yaml | kubectl apply -f -
+
 export ADMIN_PASSWORD=$(kubectl get secret -n openfaas basic-auth -o jsonpath='{.data.basic-auth-password}'| base64 --decode)
 
 faas-cli template pull 

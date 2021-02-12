@@ -34,6 +34,7 @@ func init() {
 	rootCommand.AddCommand(applyCmd)
 
 	applyCmd.Flags().StringArrayP("file", "f", []string{""}, "A number of init.yaml plan files")
+	applyCmd.Flags().Bool("skip-redis", false, "Skip Redis installation")
 	applyCmd.Flags().Bool("skip-create-secrets", false, "Skip creating secrets")
 	applyCmd.Flags().Bool("print-plan", false, "Print merged plan and exit")
 }
@@ -46,6 +47,7 @@ var applyCmd = &cobra.Command{
 }
 
 type InstallPreferences struct {
+	SkipRedis         bool
 	SkipCreateSecrets bool
 }
 
@@ -65,6 +67,10 @@ func runApplyCommandE(command *cobra.Command, _ []string) error {
 		return err
 	}
 
+	prefs.SkipRedis, err = command.Flags().GetBool("skip-redis")
+	if err != nil {
+		return err
+	}
 	prefs.SkipCreateSecrets, err = command.Flags().GetBool("skip-create-secrets")
 	if err != nil {
 		return err
@@ -300,6 +306,12 @@ func process(plan types.Plan, prefs InstallPreferences) error {
 		return errors.Wrap(err, "stack.Apply(")
 	}
 
+	if !prefs.SkipRedis {
+		if err := installRedis(); err != nil {
+			return errors.Wrap(err, "unable to install redis")
+		}
+	}
+
 	if err := cloneCloudComponents(plan.OpenFaaSCloudVersion); err != nil {
 		return errors.Wrap(err, "cloneCloudComponents")
 	}
@@ -420,6 +432,35 @@ func installIngressController(ingress string) error {
 	res, err := task.Execute()
 	if err != nil {
 		return errors.Wrap(err, "error installing ingress-nginx")
+	}
+
+	if res.ExitCode != 0 {
+		return fmt.Errorf("non-zero exit-code: %s %s", res.Stdout, res.Stderr)
+	}
+
+	if len(res.Stderr) > 0 {
+		log.Printf("stderr: %s\n", res.Stderr)
+	}
+	return nil
+}
+
+func installRedis() error {
+	log.Println("Installing redis")
+
+	var env []string
+	args := []string{"install", "redis", "--namespace=openfaas", "--wait"}
+
+	task := execute.ExecTask{
+		Command:     "arkade",
+		Args:        args,
+		Shell:       true,
+		Env:         env,
+		StreamStdio: false,
+	}
+
+	res, err := task.Execute()
+	if err != nil {
+		return err
 	}
 
 	if res.ExitCode != 0 {

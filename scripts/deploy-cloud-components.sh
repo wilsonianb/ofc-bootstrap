@@ -31,6 +31,7 @@ kubectl create secret generic redis-password -n openfaas-fn --from-literal redis
 export ADMIN_PASSWORD=$(kubectl get secret -n openfaas basic-auth -o jsonpath='{.data.basic-auth-password}'| base64 --decode)
 
 faas-cli template pull 
+faas-cli template store pull golang-middleware
 
 kubectl port-forward svc/gateway -n openfaas 31111:8080 &
 sleep 2

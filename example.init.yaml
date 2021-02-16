@@ -84,6 +84,15 @@ deployment:
     - "https://github.com/openfaas-incubator/python-flask-template.git"
     - "https://github.com/openfaas-incubator/ruby-http"
 
+## Define function invocation pricing
+pricing:
+  ## Cost per `unit_invocations` for function invocations denominated in your wallet asset (code and scale).
+  cost_per_unit_invocations: 1
+  unit_invocations: 100
+
+  ## The number of allowed invocations if the function balance is insufficient
+  bonus_invocations: 50
+
 ## TLS
 tls: false
 tls_config:

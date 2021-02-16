@@ -10,9 +10,12 @@ import (
 )
 
 type gatewayConfig struct {
-	RootDomain      string
-	Scheme          string
-	CustomTemplates string
+	RootDomain       string
+	Scheme           string
+	CustomTemplates  string
+	InvocationCost   string
+	InvocationUnits  string
+	BonusInvocations string
 }
 
 type authConfig struct {
@@ -29,9 +32,12 @@ func Apply(plan types.Plan) error {
 	}
 
 	if gwConfigErr := generateTemplate("gateway_config", plan, gatewayConfig{
-		RootDomain:      plan.RootDomain,
-		Scheme:          scheme,
-		CustomTemplates: plan.Deployment.FormatCustomTemplates(),
+		RootDomain:       plan.RootDomain,
+		Scheme:           scheme,
+		CustomTemplates:  plan.Deployment.FormatCustomTemplates(),
+		InvocationCost:   plan.Pricing.InvocationCost,
+		InvocationUnits:  plan.Pricing.InvocationUnits,
+		BonusInvocations: plan.Pricing.BonusInvocations,
 	}); gwConfigErr != nil {
 		return gwConfigErr
 	}

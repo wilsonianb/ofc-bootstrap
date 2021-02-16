@@ -18,3 +18,9 @@ environment:
   prometheus_host: prometheus.openfaas
   prometheus_port: 9090
   metrics_window: 60m
+  redis_uri: redis-slave.openfaas:6379
+
+# Pricing
+  cost_per_unit_invocations: {{ .InvocationCost }}
+  unit_invocations: {{ .InvocationUnits }}
+  bonus_invocations: {{ .BonusInvocations }}

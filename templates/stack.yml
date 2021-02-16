@@ -3,6 +3,27 @@ provider:
   gateway: http://127.0.0.1:8080
 
 functions:
+  billing:
+    lang: golang-middleware
+    handler: ./billing
+    # image: ghcr.io/${REPO:-codius}/ofc-billing:latest
+    image: ghcr.io/${REPO:-codius}/ofc-billing:dev
+    labels:
+      openfaas-cloud: "1"
+      role: openfaas-system
+      com.openfaas.scale.zero: false
+    environment_file:
+      - gateway_config.yml
+    environment:
+      cost_per_unit_invocations: ${cost_per_unit_invocations:-10}
+      unit_invocations: ${unit_invocations:-1000}
+      bonus_invocations: ${bonus_invocations:-50}
+      balances_key_prefix: "balances"
+      write_debug: true
+      combine_output: false
+    secrets:
+      - redis-password
+
   garbage-collect:
     lang: go
     handler: ./garbage-collect

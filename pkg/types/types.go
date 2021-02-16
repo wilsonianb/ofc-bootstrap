@@ -42,6 +42,7 @@ type Plan struct {
 	NetworkPolicies      bool                     `yaml:"network_policies,omitempty"`
 	IngressOperator      bool                     `yaml:"ingress_operator,omitempty"`
 	OpenFaaSOperator     bool                     `yaml:"openfaas_operator,omitempty"`
+	Pricing              Pricing                  `yaml:"pricing,omitempty"`
 }
 
 // Deployment is the deployment section of YAML concerning
@@ -58,6 +59,14 @@ func (d Deployment) FormatCustomTemplates() string {
 	}
 
 	return strings.TrimRight(val, " ,")
+}
+
+// Pricing is the pricing section of YAML concerning
+// function invocation pricing
+type Pricing struct {
+	InvocationCost   string `yaml:"cost_per_unit_invocations,omitempty"`
+	InvocationUnits  string `yaml:"unit_invocations,omitempty"`
+	BonusInvocations string `yaml:"bonus_invocations,omitempty"`
 }
 
 type KeyValueTuple struct {

@@ -494,6 +494,7 @@ func installOpenfaas(scaleToZero, ingressOperator, openfaasOperator bool) error 
 		"--set faasnetes.imagePullPolicy=IfNotPresent",
 		"--set ingressOperator.create=" + strconv.FormatBool(ingressOperator),
 		"--set operator.create=" + strconv.FormatBool(openfaasOperator),
+		"--set clusterRole=true",
 		"--wait",
 	}
 

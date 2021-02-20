@@ -478,8 +478,10 @@ func installOpenfaas(scaleToZero, ingressOperator, openfaasOperator bool) error 
 
 	args := []string{"install", "openfaas",
 		"--set basic_auth=true",
+		"--set basicAuthPlugin.image=ghcr.io/codius/basic-auth:latest",
 		"--set functionNamespace=openfaas-fn",
 		"--set ingress.enabled=false",
+		"--set gateway.image=ghcr.io/codius/gateway:latest",
 		"--set gateway.scaleFromZero=true",
 		"--set gateway.readTimeout=15m",
 		"--set gateway.writeTimeout=15m",
